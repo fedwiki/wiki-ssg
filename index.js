@@ -1,14 +1,21 @@
-import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
+import {minimist, fs, path, glob, mkdirp, hb, require} from "./deps.js"
 
-let DATA = path.resolve("./data")
-let BASE = path.resolve(".", "docs")
-let CLIENT = path.resolve(require.resolve("wiki-client/package.json"), "..")
-let SERVER = path.resolve(require.resolve("wiki-server/package.json"), "..")
-let DEPS = path.join(CLIENT, "..")
-let ownedBy = await owner()
-const htmlTemplate = await createTemplate("wiki-client/views/static.html")
+function usage() {console.log(`
+  wiki-ssg build --from <dir> --dest <dir>
+
+  generates a static wiki site
+
+  Options:
+    --from <folder> ... copy wiki pages and assets from the specified folder
+    --dest <folder> ... generate the static site in the specified folder
+
+`)}
+
+let DATA, BASE, CLIENT, SERVER, DEPS, ownedBy
 
 export async function main() {
+  await parseArgv()
+
   await Promise.all([
     copyWikiClientCode(),
     createFactories(),
@@ -17,6 +24,35 @@ export async function main() {
     copyDefaultData(),
     copyWikiData()
   ])
+}
+
+const htmlTemplate = await createTemplate("wiki-client/views/static.html")
+async function parseArgv() {
+  let args = minimist(process.argv.slice(2))
+  let [cmd] = args._
+  switch (true) {
+  case cmd == "build":
+    DATA = path.resolve("./data")
+    BASE = path.resolve(".", "docs")
+    CLIENT = path.resolve(require.resolve("wiki-client/package.json"), "..")
+    SERVER = path.resolve(require.resolve("wiki-server/package.json"), "..")
+    DEPS = path.join(CLIENT, "..")
+    ownedBy = await owner()
+    break
+  case args.version || args.v || cmd == "version":
+    console.log(await version())
+    process.exit(1)
+  case args.help || args.h || cmd == "help":
+  default:
+    usage()
+    process.exit(1)
+  }
+}
+
+async function version() {
+  let pkg = JSON.parse(
+    await fs.readFile(new URL("package.json", import.meta.url) , "utf8"))
+  return pkg.version
 }
 
 const writers = new Map()
