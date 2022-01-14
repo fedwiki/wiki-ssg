@@ -1,14 +1,12 @@
 import {minimist, fs, path, glob, mkdirp, hb, require} from "./deps.js"
 
-function usage() {console.log(`
-  wiki-ssg build --from <dir> --dest <dir>
+function usage() {console.log(`wiki-ssg build --from <dir> --dest <dir>
 
   generates a static wiki site
 
   Options:
     --from <folder> ... copy wiki pages and assets from the specified folder
     --dest <folder> ... generate the static site in the specified folder
-
 `)}
 
 let DATA, BASE, CLIENT, SERVER, DEPS, ownedBy
@@ -28,9 +26,19 @@ export async function main() {
 
 const htmlTemplate = await createTemplate("wiki-client/views/static.html")
 async function parseArgv() {
-  let args = minimist(process.argv.slice(2))
+  let args = minimist(process.argv.slice(2), {
+    string: ["from", "dest"], boolean: ["help", "version"], alias: {
+      h: "help", v: "version"
+    }
+  })
   let [cmd] = args._
   switch (true) {
+  case args.help || cmd == "help":
+    usage()
+    process.exit(1)
+  case args.version || cmd == "version":
+    console.log(await version())
+    process.exit(1)
   case cmd == "build":
     DATA = path.resolve("./data")
     BASE = path.resolve(".", "docs")
@@ -39,10 +47,6 @@ async function parseArgv() {
     DEPS = path.join(CLIENT, "..")
     ownedBy = await owner()
     break
-  case args.version || args.v || cmd == "version":
-    console.log(await version())
-    process.exit(1)
-  case args.help || args.h || cmd == "help":
   default:
     usage()
     process.exit(1)
@@ -177,10 +181,6 @@ async function copyWikiData() {
     console.log("No favicon.png found in data/status. We'll just keep the default.")
   })
   copyp(
-    path.join(DATA, "assets", "wiki", "CNAME"),
-    path.join(BASE, "CNAME")
-  )
-  copyp(
     path.join(DATA, "assets", "wiki", "404.html"),
     path.join(BASE, "404.html")
   )
@@ -203,5 +203,3 @@ async function copyp(source, destination) {
 }
 const findfiles = pattern => glob(pattern, {nodir: true})
 const findfolders = pattern => glob(path.join(pattern, "/"))
-
-await main()
