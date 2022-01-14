@@ -1,27 +1,28 @@
 {
-  "name": "wiki-static",
+  "name": "wiki-ssg",
   "version": "0.1.0",
-  "description": "compile a read-only federated wiki suitable for static web hosting",
+  "description": "federated wiki static site generator",
+  "bin": "./index.js",
   "scripts": {
-    "readonly": "node readonly.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fedwiki/wiki-static.git"
+    "url": "git+https://github.com/fedwiki/wiki-generate.git"
   },
   "keywords": [
     "wiki",
     "federated wiki",
     "readonly wiki",
-    "static wiki"
+    "static wiki",
+    "static site generator"
   ],
   "author": "Eric Dobbs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fedwiki/wiki-static/issues"
+    "url": "https://github.com/fedwiki/wiki-generate/issues"
   },
-  "homepage": "https://github.com/fedwiki/wiki-static#readme",
+  "homepage": "https://github.com/fedwiki/wiki-generate#readme",
   "devDependencies": {
     "http-server": "^14.0.0",
     "wiki": "^0.27.0"

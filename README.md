@@ -16,7 +16,7 @@ Quit the local wiki server.
 
 Generate the static site.
 
-    npm run readonly
+    npx wiki-ssg
 
 Run a simple http server.
 
