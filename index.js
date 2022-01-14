@@ -1,12 +1,6 @@
 #!/usr/bin/env node
-const fs = require("fs/promises")
-const path = require("path")
-const util = require("util")
-const glob = util.promisify(require("glob"))
-const mkdirp = require("mkdirp")
-const hb = require("handlebars")
+import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
 
-async function fakeTopLevelAwait() {
   let PKG = path.resolve(".")
   let BASE = path.resolve(".", "docs")
   let CLIENT = path.resolve(require.resolve("wiki-client/package.json"), "..")
@@ -15,7 +9,7 @@ async function fakeTopLevelAwait() {
   let ownedBy = await owner()
   const htmlTemplate = await createTemplate("wiki-client/views/static.html")
 
-  async function main() {
+  export async function main() {
     await Promise.all([
       copyWikiClientCode(),
       createFactories(),
@@ -176,6 +170,3 @@ async function fakeTopLevelAwait() {
   const findfolders = pattern => glob(path.join(pattern, "/"))
 
   await main()
-}
-
-fakeTopLevelAwait()
