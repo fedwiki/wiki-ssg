@@ -1,7 +1,6 @@
-#!/usr/bin/env node
 import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
 
-  let PKG = path.resolve(".")
+  let DATA = path.resolve("./data")
   let BASE = path.resolve(".", "docs")
   let CLIENT = path.resolve(require.resolve("wiki-client/package.json"), "..")
   let SERVER = path.resolve(require.resolve("wiki-server/package.json"), "..")
@@ -30,7 +29,7 @@ import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
   }
 
   async function owner() {
-    let ownerfile = path.join(PKG, "data", "status", "owner.json")
+    let ownerfile = path.join(DATA, "status", "owner.json")
     try {
       let json = JSON.parse(await fs.readFile(ownerfile, "utf8"))
       return json.name
@@ -118,8 +117,8 @@ import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
   }
 
   async function copyWikiData() {
-    copyPages(await findfiles(path.join(PKG, "data", "pages", "**")))
-    let STATUS = path.join(PKG, "data", "status")
+    copyPages(await findfiles(path.join(DATA, "pages", "**")))
+    let STATUS = path.join(DATA, "status")
     for (let filename of await findfiles(path.join(STATUS, "site*json"))) {
       let destination = path.join(BASE,"system", filename.slice(STATUS.length))
       copyp(filename, destination)
@@ -127,13 +126,13 @@ import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
     copyp(
       path.join(STATUS, "sitemap.xml"),
       path.join(BASE, "sitemap.xml"))
-    for (let filename of await findfiles(path.join(PKG, "data", "assets", "**"))) {
+    for (let filename of await findfiles(path.join(DATA, "assets", "**"))) {
       let destination = path.join(
-        BASE, filename.slice(path.join(PKG, "data").length))
+        BASE, filename.slice(path.join(DATA).length))
       copyp(filename, destination)
     }
     copyp(
-      path.join(PKG, "data", "status", "favicon.png"),
+      path.join(DATA, "status", "favicon.png"),
       path.join(BASE, "favicon.png")
     ).catch (error => {
       if (error.code != 'ENOENT') {
@@ -142,11 +141,11 @@ import {fs, path, glob, mkdirp, hb, require} from "./deps.js"
       console.log("No favicon.png found in data/status. We'll just keep the default.")
     })
     copyp(
-      path.join(PKG, "data", "assets", "wiki", "CNAME"),
+      path.join(DATA, "assets", "wiki", "CNAME"),
       path.join(BASE, "CNAME")
     )
     copyp(
-      path.join(PKG, "data", "assets", "wiki", "404.html"),
+      path.join(DATA, "assets", "wiki", "404.html"),
       path.join(BASE, "404.html")
     )
     copyp(
