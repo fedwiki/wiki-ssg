@@ -161,39 +161,7 @@ async function copyDefaultData() {
 async function create404() {
   let welcomefile = path.join(BASE, "welcome-visitors.html")
   let welcome = await fs.readFile(welcomefile, "utf8")
-  let script = `  <script>
-   (function ({pathname}) {
-     const slugHtml = p => /^\\/[-\\w]+\\.html/.test(p)
-     const lineup = p => /^\\/(?:view|[-\\w]+(?:\\.[-\\w]+)+)\\b/.test(p)
-     const main = document.querySelector('.main')
-     if (!slugHtml(pathname) && lineup(pathname)) {
-       // add <div id="slug"> tags
-       main.innerHTML = ""
-       pathname.slice(1).split(/\\//).reduce((acc, part, idx) => {
-         console.log("404", {idx, branch: idx%2==0, part})
-         if (idx%2 == 0) {
-           let div = document.createElement("div")
-           div.setAttribute("class", "page")
-           div.setAttribute("tabindex", "-1")
-           if (part != "view") {
-             div.setAttribute("data-site", part)
-           }
-           acc.push(div)
-         } else {
-           let div = acc[acc.length-1]
-           div.id = part
-           console.log("404", div)
-         }
-         return acc
-       }, []).forEach(div => main.appendChild(div))
-       console.log("404", Array.from(main.querySelectorAll('div.page')))
-     }
-     let client = document.createElement('script')
-     client.setAttribute('src', '/client.js')
-     client.setAttribute('type', 'text/javascript')
-     document.head.appendChild(client)
-   })(location)
-  </script>`
+  let script = `  <script type="text/javascript" src="/404.js"></script>`
   let html = welcome.split(/\n/).reduce((html, line) => {
     if (/(script src=.\/client\.js.|wiki\.security.user.)/.test(line)) {
       return html
@@ -207,6 +175,8 @@ async function create404() {
   let the404file = path.join(BASE, "404.html")
   guard(the404file, () => fs.writeFile(the404file, html))
     .catch(err => console.error({err}))
+  let the404jsfile = path.join(BASE, "404.js")
+  copyp(new URL("./404.js", import.meta.url), the404jsfile)
 }
 
 async function copyWikiData() {
