@@ -74,7 +74,7 @@ async function owner() {
     let json = JSON.parse(await fs.readFile(ownerfile, "utf8"))
     return json.name
   } catch (error) {
-    console.error({error})
+    console.warn('No owner found. Will use "Anonymous"')
     return "Anonymous"
   }
 }
@@ -199,7 +199,13 @@ async function copyp(source, destination) {
   // ensure path to destination exists before copying
   await mkdirp(path.dirname(destination))
   guard(destination, () =>
-    fs.copyFile(source, destination))
+    fs.copyFile(source, destination)
+      .catch(error => {
+        if (error.code != 'ENOENT') {
+          throw error
+        }
+        console.warn(`couldn't copy "${error.path}". Skipping.`)
+      }))
 }
 const findfiles = pattern => glob(pattern, {nodir: true})
 const findfolders = pattern => glob(path.join(pattern, "/"))
