@@ -9,8 +9,6 @@ function usage() {console.log(`wiki-ssg build --from <dir> --dest <dir>
     --dest <folder> ... generate the static site in the specified folder
 `)}
 
-let DATA, BASE, CLIENT, SERVER, DEPS, ownedBy
-
 export async function main() {
   await parseArgv()
 
@@ -24,6 +22,10 @@ export async function main() {
   ])
 }
 
+let DATA, BASE, ownedBy
+let CLIENT = path.resolve(require.resolve("wiki-client/package.json"), "..")
+let SERVER = path.resolve(require.resolve("wiki-server/package.json"), "..")
+let DEPS = path.join(CLIENT, "..")
 const htmlTemplate = await createTemplate("wiki-client/views/static.html")
 async function parseArgv() {
   let args = minimist(process.argv.slice(2), {
@@ -40,11 +42,8 @@ async function parseArgv() {
     console.log(await version())
     process.exit(1)
   case cmd == "build":
-    DATA = path.resolve("./data")
-    BASE = path.resolve(".", "docs")
-    CLIENT = path.resolve(require.resolve("wiki-client/package.json"), "..")
-    SERVER = path.resolve(require.resolve("wiki-server/package.json"), "..")
-    DEPS = path.join(CLIENT, "..")
+    DATA = args.from || path.resolve("./data")
+    BASE = args.dest || path.resolve(".", "docs")
     ownedBy = await owner()
     break
   default:
