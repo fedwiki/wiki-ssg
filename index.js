@@ -124,21 +124,23 @@ async function copyCode(source, destination) {
 }
 
 async function copyPages(pages, jsonfn=x=>x) {
-  pages.map(async name => {
-    let slug = path.basename(name)
-    let jsonFile = path.join(BASE, `${slug}.json`)
-    fs.readFile(name, "utf8").then(JSON.parse).then(async json => {
-      jsonfn(json)
-      let string = JSON.stringify(json, null, 2)
-      guard(jsonFile, () =>
-        fs.writeFile(jsonFile, string).catch(error => console.error({error})))
+  return await Promise.all(
+    pages.map(async name => {
+      let slug = path.basename(name)
+      let jsonFile = path.join(BASE, `${slug}.json`)
+      fs.readFile(name, "utf8").then(JSON.parse).then(async json => {
+        jsonfn(json)
+        let string = JSON.stringify(json, null, 2)
+        guard(jsonFile, () =>
+          fs.writeFile(jsonFile, string).catch(error => console.error({error})))
+      })
+      let htmlFile = path.join(BASE, `${slug}.html`)
+      await mkdirp(path.dirname(htmlFile))
+      guard(htmlFile, () =>
+        fs.writeFile(htmlFile, htmlTemplate({ownedBy,pages: [{page: slug}]}))
+          .catch(err => console.error({err})))
     })
-    let htmlFile = path.join(BASE, `${slug}.html`)
-    await mkdirp(path.dirname(htmlFile))
-    guard(htmlFile, () =>
-      fs.writeFile(htmlFile, htmlTemplate({ownedBy,pages: [{page: slug}]}))
-        .catch(err => console.error({err})))
-  })
+  )
 }
 
 async function copySecurityFriends() {
@@ -150,9 +152,61 @@ async function copySecurityFriends() {
 
 async function copyDefaultData() {
   copyPages(await findfiles(path.join(SERVER, "default-data", "pages", "**")))
+    .then(create404)
   copyp(
     path.join(SERVER, "default-data", "status", "favicon.png"),
     path.join(BASE, "favicon.png"))
+}
+
+async function create404() {
+  let welcomefile = path.join(BASE, "welcome-visitors.html")
+  let welcome = await fs.readFile(welcomefile, "utf8")
+  let script = `  <script>
+   (function ({pathname}) {
+     const slugHtml = p => /^\\/[-\\w]+\\.html/.test(p)
+     const lineup = p => /^\\/(?:view|[-\\w]+(?:\\.[-\\w]+)+)\\b/.test(p)
+     const main = document.querySelector('.main')
+     if (!slugHtml(pathname) && lineup(pathname)) {
+       // add <div id="slug"> tags
+       main.innerHTML = ""
+       pathname.slice(1).split(/\\//).reduce((acc, part, idx) => {
+         console.log("404", {idx, branch: idx%2==0, part})
+         if (idx%2 == 0) {
+           let div = document.createElement("div")
+           div.setAttribute("class", "page")
+           div.setAttribute("tabindex", "-1")
+           if (part != "view") {
+             div.setAttribute("data-site", part)
+           }
+           acc.push(div)
+         } else {
+           let div = acc[acc.length-1]
+           div.id = part
+           console.log("404", div)
+         }
+         return acc
+       }, []).forEach(div => main.appendChild(div))
+       console.log("404", Array.from(main.querySelectorAll('div.page')))
+     }
+     let client = document.createElement('script')
+     client.setAttribute('src', '/client.js')
+     client.setAttribute('type', 'text/javascript')
+     document.head.appendChild(client)
+   })(location)
+  </script>`
+  let html = welcome.split(/\n/).reduce((html, line) => {
+    if (/(script src=.\/client\.js.|wiki\.security.user.)/.test(line)) {
+      return html
+    }
+    if (/<\/body>/.test(line)) {
+      return `${html}${script}\n${line}\n`
+    } else {
+      return `${html}${line}\n`
+    }
+  }, "")
+  let the404file = path.join(BASE, "404.html")
+  guard(the404file, () => fs.writeFile(the404file, html))
+    .catch(err => console.error({err}))
 }
 
 async function copyWikiData() {
@@ -179,10 +233,6 @@ async function copyWikiData() {
     }
     console.log("No favicon.png found in data/status. We'll just keep the default.")
   })
-  copyp(
-    path.join(DATA, "assets", "wiki", "404.html"),
-    path.join(BASE, "404.html")
-  )
   copyp(
     path.join(BASE, "welcome-visitors.html"),
     path.join(BASE, "index.html")

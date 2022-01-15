@@ -16,10 +16,10 @@ Quit the local wiki server.
 
 Generate the static site.
 
-    npx wiki-ssg
+    npx wiki-ssg build --from data --dest site
 
 Run a simple http server.
 
-    npx http-server docs
+    npx http-server site
 
 Visit http://localhost:8080 to test the static wiki.
