@@ -1,9 +1,9 @@
 # Wiki Static Site Generator
 
-First, run a local wiki.
+First, install and run a local wiki.
 
-    npx wiki \
-      --packageDir node_modules \
+    npm install -g wiki
+    wiki \
       --security_type=friends \
       --data ./data
 
