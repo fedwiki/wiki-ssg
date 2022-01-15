@@ -1,6 +1,6 @@
 {
   "name": "wiki-ssg",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "federated wiki static site generator",
   "type": "module",
   "bin": "bin/cli.js",
