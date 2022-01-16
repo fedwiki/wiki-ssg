@@ -1,4 +1,5 @@
-import {minimist, fs, path, glob, mkdirp, hb, require} from "./deps.js"
+import {minimist, fs, fsConstants, path,
+        glob, mkdirp, hb, require} from "./deps.js"
 
 function usage() {console.log(`wiki-ssg build --from <dir> --dest <dir>
 
@@ -68,7 +69,21 @@ function guard(filename, fn) { // serialize writes to the same file
 }
 
 async function owner() {
-  let ownerfile = path.join(DATA, "status", "owner.json")
+  let HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+  let search = await Promise.all([
+    path.join(DATA, "status", "owner.json"),
+    path.join(HOME, ".wiki", "owner.json")
+  ].map(
+    async candidate => fs.access(candidate, fsConstants.R_OK)
+      .then(() => [candidate, true])
+      .catch(error => {
+        if (error.code != "ENOENT") {
+          throw error
+        }
+        return [candidate, false]
+      })
+  ))
+  let ownerfile = search.find(([f, readable]) => readable)[0]
   try {
     let json = JSON.parse(await fs.readFile(ownerfile, "utf8"))
     return json.name
