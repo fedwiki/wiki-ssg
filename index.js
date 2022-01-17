@@ -18,9 +18,9 @@ export async function main() {
     createFactories(),
     copyPlugins(),
     copySecurityFriends(),
-    copyDefaultData(),
-    copyWikiData()
+    copyDefaultData()
   ])
+  await copyWikiData()
 }
 
 let DATA, BASE, ownedBy
