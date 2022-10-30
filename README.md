@@ -23,3 +23,23 @@ Run a simple http server.
     npx http-server site
 
 Visit http://localhost:8080 to test the static wiki.
+
+# Development
+
+To upgrade to a new version of wiki, update the version in
+`package.json`, and then re-install dependencies:
+
+    npm install
+
+Probably also need to update the link for NPM global install
+
+    npm install -g .
+
+Use the instructions at the top of the page to re-generate a site and
+run the simple http server to test that the updates work as expected.
+
+Then commit and push the changes.
+
+    git add .
+    git commit -m "upgrade wiki to version..."
+    git push
