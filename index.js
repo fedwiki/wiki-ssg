@@ -72,7 +72,8 @@ async function owner() {
   let HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
   let search = await Promise.all([
     path.join(DATA, "status", "owner.json"),
-    path.join(HOME, ".wiki", "owner.json")
+    path.join(HOME, ".wiki", "owner.json"),
+    path.join(HOME, ".wiki", "localhost.owner.json")
   ].map(
     async candidate => fs.access(candidate, fsConstants.R_OK)
       .then(() => [candidate, true])

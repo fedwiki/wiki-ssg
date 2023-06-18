@@ -43,3 +43,22 @@ Then commit and push the changes.
     git add .
     git commit -m "upgrade wiki to version..."
     git push
+
+# Development with a custom wiki client
+
+    npm install $PATH_TO_CUSTOM/wiki-client/
+    cd node_modules/wiki-client
+    npm install
+    npm install grunt
+    npx grunt build
+    cd ../..
+    npm install -g .
+
+Use the instructions at the top of the page to re-generate a site and
+run the simple http server to test that the updates work as expected.
+
+To reset the dev environment to a released version
+
+    rm -rf node_modules
+    npm install
+    npm install -g .
