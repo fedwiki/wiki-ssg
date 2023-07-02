@@ -42,7 +42,8 @@ Then commit and push the changes.
 
     git add .
     git commit -m "upgrade wiki to version..."
-    git push
+    TAG=$(npm version patch)
+    git push --atomic origin main "$TAG"
 
 # Development with a custom wiki client
 
