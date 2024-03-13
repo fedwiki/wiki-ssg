@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fedwiki/wiki-generate.git"
+    "url": "git+https://github.com/fedwiki/wiki-ssg.git"
   },
   "keywords": [
     "wiki",
@@ -21,9 +21,9 @@
   "author": "Eric Dobbs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fedwiki/wiki-generate/issues"
+    "url": "https://github.com/fedwiki/wiki-ssg/issues"
   },
-  "homepage": "https://github.com/fedwiki/wiki-generate#readme",
+  "homepage": "https://github.com/fedwiki/wiki-ssg#readme",
   "devDependencies": {
     "http-server": "^14.0.0"
   },
