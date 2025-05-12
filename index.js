@@ -118,7 +118,7 @@ async function createFactories() {
 
 async function copyPlugins() {
   for (let name of await findfolders(path.join(DEPS, "wiki-plugin-*", "client"))) {
-    let plugin = name.slice(0, -8)
+    let plugin = name.slice(0, -7)
     let type = plugin.slice(path.join(DEPS, "wiki-plugin-").length)
     let pluginsdir = path.join(BASE, "plugins", type)
 
