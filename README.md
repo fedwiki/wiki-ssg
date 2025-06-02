@@ -29,6 +29,7 @@ Visit http://localhost:8080 to test the static wiki.
 To upgrade to a new version of wiki, update the version in
 `package.json`, and then re-install dependencies:
 
+    rm -rf package-lock.json node_modules
     npm install
 
 Probably also need to update the link for NPM global install
